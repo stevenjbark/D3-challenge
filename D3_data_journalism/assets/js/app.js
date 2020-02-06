@@ -1,7 +1,7 @@
 // Create responsive chart as demonstrated in Exercise 08-Evr-D3
 
 //Function to resize chart
-//function responsiveChart() {
+function responsiveChart() {
 
     //Clear svg area if it isn't empty, and resize if it has been replaces
     var svgArea = d3.select("#scatter").select("svg");
@@ -18,9 +18,9 @@
     //Set margins
     var margin = {
         top: 30,
-        bottom: 30,
-        left: 30,
-        right: 30
+        bottom: 50,
+        left: 50,
+        right: 200
     };
 
     //Set chart height and width linked to window height and width from svgWidth/svgHeight linked to window width/height.
@@ -102,23 +102,23 @@
             .attr("opacity", "0,5")
 
         //TRY TO CREATE LABEL
-        // var textElems = chartGroup.selectAll("text")
-        //     .data(censusData)
-        //     .enter()
-        //     .append("text")
-        //     .text(function(d) {
-        //         return d.abbr;
-        //     })
-        //     .attr("x", d => xLinearScale(d.healthcare) - 10)
-        //     .attr("y", d => yLinearScale(d.poverty) + 5);
+        var textElems = chartGroup.selectAll("text")
+            .data(censusData)
+            .enter()
+            .append("text")
+            .text(function(d){
+                return d.abbr;
+            })
+            .attr("x", d => xLinearScale(d.healthcare) - 10)
+            .attr("y", d => yLinearScale(d.poverty) + 5);
 
 
         //CREATE TOOLTIPS
         var toolTip = d3.tip()
             .attr("class", "tooltip")
-            .offset([30,0])
+            .offset([0,0])
             .html(function(d){
-                return (`${d.abbr}`);
+                return (`${d.abbr}, $${d.income}`);
             });
 
         //Add tooltips in the chart
@@ -134,10 +134,27 @@
                 toolTip.hide(data);
             });
 
+        //Create Axes Labels
+        //Y axis label
+        chartGroup.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left +10)
+            .attr("x", 0 - (chartHeight / 2))
+            .attr("class", "axisText")
+            .text("Poverty Index");
+
+        //X axis label
+        chartGroup.append("text")
+            .attr("y", chartHeight + margin.top + 5)
+            .attr("x", chartWidth / 2)
+            .attr("class", "axisText")
+            .text("Healthcare Index");
     });
+};
 
+//call responsiveChart when page loads
+responsiveChart();
 
-
-
-//};
+//call makeResponsive when page is resized
+d3.select(window).on("resize", responsiveChart);
 
