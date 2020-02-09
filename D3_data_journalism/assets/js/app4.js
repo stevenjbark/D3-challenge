@@ -95,7 +95,15 @@ function responsiveChart() {
             .domain([d3.min(censusData, d => d.obesity), d3.mean(censusData, d => d.obesity), d3.max(censusData, d => d.obesity)])
             .range(["green", "yellow", "red"]);
 
+        
+        //tool_tip implementation per David Gotz's Example (https://bl.ocks.org/davegotz/bd54b56723c154d25eedde6504d30ad7) 
+        var tool_tip = d3.tip()
+            .attr("class", "d3-tip")
+            .offset([0,50])
+            .html(function(d) { return `${d.state}<hr>$${d.income}<hr>Obesity Index: ${d.obesity}, Smoking Index: ${d.smokes}`});
+            
 
+        svg.call(tool_tip);
 
 
 
@@ -106,22 +114,25 @@ function responsiveChart() {
 
             circleGroup
             .append("circle")
+            .attr("class", "circle")
             .attr("cx", d => xLinearScale(d.healthcare))
             .attr("cy", d => yLinearScale(d.poverty))
             .attr("r", d => ((d.income*d.income)/110000000))
             .attr( "fill", function(d) { return colorScale(d.obesity); })
             .attr("opacity", "0.7")
+            .style("stroke", "black")
 
-
-        //TRY TO CREATE LABEL
+        //CREATE LABELS USING ABBREVIATIONS
             circleGroup
             .append("text")
             .text(function(d){
                 return d.abbr;
             })
             .attr("x", d => xLinearScale(d.healthcare) - 11)
-            .attr("y", d => yLinearScale(d.poverty) + 6);
+            .attr("y", d => yLinearScale(d.poverty) + 6)
         
+            .on("click", tool_tip.show)
+            .on("mouseout", tool_tip.hide)
 
         //Create Axes Labels
         //Y axis label
