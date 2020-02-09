@@ -92,8 +92,11 @@ function responsiveChart() {
 
         //Establish a color scale for plotting obesity data by color on the graph.
         var colorScale = d3.scaleLinear()
-            .domain([d3.min(censusData, d => d.obesity), d3.max(censusData, d => d.obesity)])
-            .range(["green", "red"])
+            .domain([d3.min(censusData, d => d.obesity), d3.mean(censusData, d => d.obesity), d3.max(censusData, d => d.obesity)])
+            .range(["green", "yellow", "red"]);
+
+
+
 
 
         //CREATE CIRCLES FOR PLOTTING
@@ -105,9 +108,10 @@ function responsiveChart() {
             .append("circle")
             .attr("cx", d => xLinearScale(d.healthcare))
             .attr("cy", d => yLinearScale(d.poverty))
-            .attr("r", d => d.income/2500)
+            .attr("r", d => ((d.income*d.income)/110000000))
             .attr( "fill", function(d) { return colorScale(d.obesity); })
-            .attr("opacity", "0,5")
+            .attr("opacity", "0.7")
+
 
         //TRY TO CREATE LABEL
             circleGroup
@@ -115,9 +119,9 @@ function responsiveChart() {
             .text(function(d){
                 return d.abbr;
             })
-            .attr("x", d => xLinearScale(d.healthcare) - 10)
-            .attr("y", d => yLinearScale(d.poverty) + 5);
-
+            .attr("x", d => xLinearScale(d.healthcare) - 11)
+            .attr("y", d => yLinearScale(d.poverty) + 6);
+        
 
         //Create Axes Labels
         //Y axis label
@@ -134,26 +138,10 @@ function responsiveChart() {
             .attr("x", chartWidth / 2)
             .attr("class", "axisText")
             .text("Healthcare Index");
-
-
-
-        // //CREATE TOOLTIPS
-        // var toolTip = d3.tip()
-        //     .attr("class", "tooltip")
-        //     .offset([0,0])
-        //     .html(function(d){
-        //         return (`${d.abbr}, $${d.income}`)
-        //     });
-
-        // //Add tooltips in the chart
-        // chartGroup.call(toolTip);
-
-        // circleGroup
-        //     .on("click", function(d){
-        //         toolTip(show(d));
-        // })
+            
 
     });
+
 };
 
 //call responsiveChart when page loads
