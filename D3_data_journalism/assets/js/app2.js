@@ -75,6 +75,7 @@ function responsiveChart() {
             .domain([d3.min(censusData, d => d.poverty) - 1, d3.max(censusData, d => d.poverty) + 1])
             .range([chartHeight, 0]);
 
+
         //CREATE AXIS FUNCTIONS
         var bottomAxis = d3.axisBottom(xLinearScale);
         var leftAxis = d3.axisLeft(yLinearScale);
@@ -88,23 +89,30 @@ function responsiveChart() {
         //leftAxis is placed on left, no translate required.
         chartGroup.append("g")
             .call(leftAxis);
+
         
-        
+        var colorScale = d3.scaleLinear()
+            .domain([d3.min(censusData, d => d.obesity), d3.max(censusData, d => d.obesity)])
+            .range(["green", "red"])
+
+        // var domain = [d3.min(censusData, d => d.income), d3.max(censusData, d => d.income)]
+        // console.log(domain);
+
         //CREATE CIRCLES FOR PLOTTING
         var circleGroup = chartGroup.selectAll("circle")
             .data(censusData)
             .enter()
+
+            circleGroup
             .append("circle")
             .attr("cx", d => xLinearScale(d.healthcare))
             .attr("cy", d => yLinearScale(d.poverty))
-            .attr("r", "20")
-            .attr("fill", "lightblue")
+            .attr("r", d => d.income/2500)
+            .attr( "fill", function(d) { return colorScale(d.obesity); })
             .attr("opacity", "0,5")
 
         //TRY TO CREATE LABEL
-        var textElems = chartGroup.selectAll("text")
-            .data(censusData)
-            .enter()
+            circleGroup
             .append("text")
             .text(function(d){
                 return d.abbr;
@@ -113,32 +121,11 @@ function responsiveChart() {
             .attr("y", d => yLinearScale(d.poverty) + 5);
 
 
-        //CREATE TOOLTIPS
-        var toolTip = d3.tip()
-            .attr("class", "tooltip")
-            .offset([0,0])
-            .html(function(d){
-                return (`${d.abbr}, $${d.income}`);
-            });
-
-        //Add tooltips in the chart
-        chartGroup.call(toolTip);
-
-        //Create event listeners to display and hide tooltips
-        circleGroup.on("click", function(data) {
-            toolTip.show(data, this);
-        })
-
-            //on mouseout event
-            .on("mouseout", function(data) {
-                toolTip.hide(data);
-            });
-
         //Create Axes Labels
         //Y axis label
         chartGroup.append("text")
             .attr("transform", "rotate(-90)")
-            .attr("y", 0 - margin.left +10)
+            .attr("y", 0 - margin.left +15)
             .attr("x", 0 - (chartHeight / 2))
             .attr("class", "axisText")
             .text("Poverty Index");
@@ -149,6 +136,25 @@ function responsiveChart() {
             .attr("x", chartWidth / 2)
             .attr("class", "axisText")
             .text("Healthcare Index");
+
+
+
+        // //CREATE TOOLTIPS
+        // var toolTip = d3.tip()
+        //     .attr("class", "tooltip")
+        //     .offset([0,0])
+        //     .html(function(d){
+        //         return (`${d.abbr}, $${d.income}`)
+        //     });
+
+        // //Add tooltips in the chart
+        // chartGroup.call(toolTip);
+
+        // circleGroup
+        //     .on("click", function(d){
+        //         toolTip(show(d));
+        // })
+
     });
 };
 
@@ -157,4 +163,3 @@ responsiveChart();
 
 //call makeResponsive when page is resized
 d3.select(window).on("resize", responsiveChart);
-
